@@ -15,3 +15,9 @@ To run sample webcam on node:
 ```
 node app.js
 ```
+
+
+Refs:
+- https://blog.miguelgrinberg.com/post/easy-websockets-with-flask-and-gevent
+- http://flask-socketio.readthedocs.io/en/latest/
+- https://github.com/miguelgrinberg/Flask-SocketIO
