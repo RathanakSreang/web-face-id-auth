@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>WebCam</title>
+  <script src="//code.jquery.com/jquery-2.2.1.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+<a onclick="view(); return false">View..</a>
+<br>
+<a onclick="stream(); return false">Stream..</a>
+  <div id="logger"></div>
+  <video style="display: none;" id="video"> </video>
+  <canvas id="prev"></canvas>
+
+  <img id="img">
+
+  <script>
+  var socket = io();
+
+  function logger(msg) {
+    $("#logger").text(msg);
+  }
+
+  function stream() {
+    var canv = document.getElementById("prev"),
+    context = canv.getContext("2d"),
+    video = document.getElementById("video"),
+    freq = 10;
+
+    canv.width = 200;//window.innerWidth ;//  800;
+    canv.height = 200;//window.innerHeight;// 400;
+
+    context.width = canv.width;
+    context.height = canv.height;
+
+    function loadCam(stream) {
+      video.src = window.URL.createObjectURL(stream);
+      logger("Camera loaded [OKAY]");
+    }
+
+    function loadFail(stream) {
+      logger("Failed loading camera");
+    }
+
+    function viewVideo(video, context) {
+      context.drawImage(video, 0, 0, context.width, context.height);
+      socket.emit("stream", canv.toDataURL("image/webp"));
+    }
+
+    $(function() {
+      navigator.getUserMedia = navigator.getUserMedia ||
+                         navigator.webkitGetUserMedia ||
+                         navigator.mozGetUserMedia;
+
+      if(navigator.getUserMedia) {
+        navigator.getUserMedia({video: true}, loadCam, loadFail);
+      }
+      setInterval(function() {
+        viewVideo(video, context);
+      }, freq*10);
+    });
+  }
+
+  function view() {
+    logger("Wait...");
+    socket.on("stream", function (video) {
+      var img = document.getElementById("img");
+      img.src = video;
+      logger("stream play");
+    });
+  }
+  </script>
+</body>
+</html>
