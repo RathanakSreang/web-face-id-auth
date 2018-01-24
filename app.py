@@ -63,12 +63,14 @@ def test_send_image(img):
     gray = imutils.resize(gray, width=200)
     cv2.imwrite('testing.png', gray)
     rects = detector(gray, 0)
-    print(len(rects))
-    detectFace = []
-    for rect in rects:
-        (x,y,w,h) = face_utils.rect_to_bb(rect)
-        detectFace.append({'x': x, 'y': y, 'w': w, 'h': h})
-    emit('stream', {'img': img, 'detectFace': detectFace}, broadcast=True)
+    rectFace = {}
+    if len(rects) > 0:
+        (x,y,w,h) = face_utils.rect_to_bb(rects[0])
+        rectFace['x'] = x
+        rectFace['y'] = y
+        rectFace['w'] = w
+        rectFace['h'] = h
+    emit('stream', {'img': img, 'rectFace': rectFace}, broadcast=True)
 
 @socketio.on('connect')
 def test_connect():

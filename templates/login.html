@@ -18,7 +18,10 @@
       <div class="card login-card" style="width: 25rem;">
         <video style="display: none;" id="video"> </video>
         <canvas id="prev" class="prev-face"></canvas>
-        <img id="img" class="realtime-face">
+        <div class="realtime-face-wrap">
+          <img id="img" class="realtime-face">
+          <div id="face-detect" class="face-detect"></div>
+        </div>
         <div class="card-block">
           <button onclick="view(); return false" class="btn btn-primary" id="face-login">Face Login</button>
           <div id="logger"></div>
@@ -100,17 +103,31 @@
     }
 
     function view() {
-      document.getElementById("face-login").style.display = 'none';;
+      document.getElementById("face-login").style.display = 'none';
 
       stream();
       logger("Wait...");
+
       socket.on("stream", function (data) {
         console.log(data)
-        // var img = document.getElementById("img");
-        // img.src = video;
-        // logger("stream play 123");
+        var img = document.getElementById("img");
+        img.src = data['img'];
+
+        var devRect = document.getElementById("face-detect");
+        var rect = data['rectFace'];
+        if(Object.keys(rect).length !== 0) {
+          devRect.style.display = 'block';
+          devRect.style.top = rect.y + 'px';
+          devRect.style.left = rect.x + 'px';
+          devRect.style.width = rect.w + 'px';
+          devRect.style.height = rect.h + 'px';
+
+        } else {
+          devRect.style.display = 'none';
+        }
       });
     }
+
   </script>
 </body>
 </html>
