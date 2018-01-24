@@ -20,7 +20,7 @@ body {
   display: none;
 }
 
-.login-card {
+.login-card, .home {
   margin-top: 200px;
   text-align: center;
 }

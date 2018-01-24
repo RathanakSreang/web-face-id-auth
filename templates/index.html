@@ -14,11 +14,19 @@
 </head>
 <body>
   <div class="container">
-    <div class="row justify-content-md-center mt-5">
-      <div class="jumbotron">
-        <h1 class="display-3">Hello, world!</h1>
-        <h3 class="display-3">Well Come, Rathanak</h3>
-        <a href="/login">Please Login</a>
+    <div class="row justify-content-md-center">
+      <div class="jumbotron home" style="width: 25rem;">
+        {% if not current_user.id %}
+        <div class="text-center">
+          <a href="/login" class="btn btn-primary">Please Login</a>
+        </div>
+        {% else %}
+          <h1 class="display-3 text-center">Hello, world!</h1>
+          <h3>Welcome {{current_user.name}}</h3>
+          <div class="mt-5">
+            <a href="/logout">Logout</a>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
