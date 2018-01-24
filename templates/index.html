@@ -14,99 +14,13 @@
 </head>
 <body>
   <div class="container">
-    <div class="row justify-content-md-center">
-      <div class="card login-card" style="width: 20rem;">
-        <video style="display: none;" id="video"> </video>
-        <canvas id="prev" class="prev-face"></canvas>
-        <img id="img" class="realtime-face">
-        <div class="card-block">
-          <button onclick="view(); return false" class="btn btn-primary" id="face-login">Face Login</button>
-          <div id="logger"></div>
-          <!-- <br> -->
-          <!-- <a onclick="stream(); return false">Stream..</a> -->
-        </div>
+    <div class="row justify-content-md-center mt-5">
+      <div class="jumbotron">
+        <h1 class="display-3">Hello, world!</h1>
+        <h3 class="display-3">Well Come, Rathanak</h3>
+        <a href="/login">Please Login</a>
       </div>
     </div>
   </div>
-
-  <script>
-    var socket = io();
-    function logger(msg) {
-      $("#logger").text(msg);
-    }
-
-    function stream() {
-      var canv = document.getElementById("prev"),
-      context = canv.getContext("2d"),
-      video = document.getElementById("video"),
-      localstream = null;
-      freq = 10;
-
-      canv.width = 200;//window.innerWidth ;//  800;
-      canv.height = 200;//window.innerHeight;// 400;
-
-      context.width = canv.width;
-      context.height = canv.height;
-
-      function loadCam(stream) {
-        localstream = stream;
-        video.src = window.URL.createObjectURL(stream);
-        logger("Camera loaded [OKAY]");
-      }
-
-      function loadFail(stream) {
-        logger("Failed loading camera");
-      }
-
-      function viewVideo(video, context) {
-        context.drawImage(video, 0, 0, context.width, context.height);
-        socket.emit("stream", canv.toDataURL("image/webp"));
-      }
-
-      $(function() {
-        navigator.getUserMedia = navigator.getUserMedia ||
-                           navigator.webkitGetUserMedia ||
-                           navigator.mozGetUserMedia;
-
-        if(navigator.getUserMedia) {
-          navigator.getUserMedia({video: true}, loadCam, loadFail);
-        }
-
-        var duration = 60 * 5;//
-        var timer = duration, minutes, seconds;
-
-        var faceStream = setInterval(function() {
-          viewVideo(video, context);
-
-          minutes = parseInt(timer / 60, 10)
-          seconds = parseInt(timer % 60, 10);
-
-          minutes = minutes < 10 ? "0" + minutes : minutes;
-          seconds = seconds < 10 ? "0" + seconds : seconds;
-          if (--timer < 0) {
-            clearInterval(faceStream);
-            document.getElementById("face-login").style.display = 'inline-block';
-            video.pause();
-            video.src = "";
-            localstream.getTracks()[0].stop();
-            timer = duration;
-          }
-          logger("Recognizing in: " + minutes + ":" + seconds);
-        }, freq*10);
-      });
-    }
-
-    function view() {
-      document.getElementById("face-login").style.display = 'none';;
-
-      stream();
-      logger("Wait...");
-      socket.on("stream", function (video) {
-        var img = document.getElementById("img");
-        img.src = video;
-        // logger("stream play 123");
-      });
-    }
-  </script>
 </body>
 </html>

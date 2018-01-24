@@ -11,7 +11,7 @@ def index():
 
 @app.route('/login')
 def login():
-    return render_template('index.html')
+    return render_template('login.html')
 # @socketio.on('my event')
 # def test_message(message):
 #     emit('my response', {'data': message['data']})
