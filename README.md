@@ -7,6 +7,10 @@ To install python the dependencies:
 Finally you can run the application:
 
 ```
+FLASK_APP=app.py flask run
+
+or
+
 python app.py
 ```
 

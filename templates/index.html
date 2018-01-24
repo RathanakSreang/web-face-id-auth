@@ -5,73 +5,108 @@
   <title>WebCam</title>
   <script src="//code.jquery.com/jquery-2.2.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 
+  <link rel="stylesheet" type="text/css" href="/css/custom.css">
 </head>
 <body>
-<a onclick="view(); return false">View..</a>
-<br>
-<a onclick="stream(); return false">Stream..</a>
-  <div id="logger"></div>
-  <video style="display: none;" id="video"> </video>
-  <canvas id="prev"></canvas>
-
-  <img id="img">
+  <div class="container">
+    <div class="row justify-content-md-center">
+      <div class="card login-card" style="width: 20rem;">
+        <video style="display: none;" id="video"> </video>
+        <canvas id="prev" class="prev-face"></canvas>
+        <img id="img" class="realtime-face">
+        <div class="card-block">
+          <button onclick="view(); return false" class="btn btn-primary" id="face-login">Face Login</button>
+          <div id="logger"></div>
+          <!-- <br> -->
+          <!-- <a onclick="stream(); return false">Stream..</a> -->
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
-  var socket = io();
-
-  function logger(msg) {
-    $("#logger").text(msg);
-  }
-
-  function stream() {
-    var canv = document.getElementById("prev"),
-    context = canv.getContext("2d"),
-    video = document.getElementById("video"),
-    freq = 10;
-
-    canv.width = 200;//window.innerWidth ;//  800;
-    canv.height = 200;//window.innerHeight;// 400;
-
-    context.width = canv.width;
-    context.height = canv.height;
-
-    function loadCam(stream) {
-      video.src = window.URL.createObjectURL(stream);
-      logger("Camera loaded [OKAY]");
+    var socket = io();
+    function logger(msg) {
+      $("#logger").text(msg);
     }
 
-    function loadFail(stream) {
-      logger("Failed loading camera");
-    }
+    function stream() {
+      var canv = document.getElementById("prev"),
+      context = canv.getContext("2d"),
+      video = document.getElementById("video"),
+      localstream = null;
+      freq = 10;
 
-    function viewVideo(video, context) {
-      context.drawImage(video, 0, 0, context.width, context.height);
-      socket.emit("stream", canv.toDataURL("image/webp"));
-    }
+      canv.width = 200;//window.innerWidth ;//  800;
+      canv.height = 200;//window.innerHeight;// 400;
 
-    $(function() {
-      navigator.getUserMedia = navigator.getUserMedia ||
-                         navigator.webkitGetUserMedia ||
-                         navigator.mozGetUserMedia;
+      context.width = canv.width;
+      context.height = canv.height;
 
-      if(navigator.getUserMedia) {
-        navigator.getUserMedia({video: true}, loadCam, loadFail);
+      function loadCam(stream) {
+        localstream = stream;
+        video.src = window.URL.createObjectURL(stream);
+        logger("Camera loaded [OKAY]");
       }
-      setInterval(function() {
-        viewVideo(video, context);
-      }, freq*10);
-    });
-  }
 
-  function view() {
-    logger("Wait...");
-    socket.on("stream", function (video) {
-      var img = document.getElementById("img");
-      img.src = video;
-      logger("stream play 123");
-    });
-  }
+      function loadFail(stream) {
+        logger("Failed loading camera");
+      }
+
+      function viewVideo(video, context) {
+        context.drawImage(video, 0, 0, context.width, context.height);
+        socket.emit("stream", canv.toDataURL("image/webp"));
+      }
+
+      $(function() {
+        navigator.getUserMedia = navigator.getUserMedia ||
+                           navigator.webkitGetUserMedia ||
+                           navigator.mozGetUserMedia;
+
+        if(navigator.getUserMedia) {
+          navigator.getUserMedia({video: true}, loadCam, loadFail);
+        }
+
+        var duration = 60 * 5;//
+        var timer = duration, minutes, seconds;
+
+        var faceStream = setInterval(function() {
+          viewVideo(video, context);
+
+          minutes = parseInt(timer / 60, 10)
+          seconds = parseInt(timer % 60, 10);
+
+          minutes = minutes < 10 ? "0" + minutes : minutes;
+          seconds = seconds < 10 ? "0" + seconds : seconds;
+          if (--timer < 0) {
+            clearInterval(faceStream);
+            document.getElementById("face-login").style.display = 'inline-block';
+            video.pause();
+            video.src = "";
+            localstream.getTracks()[0].stop();
+            timer = duration;
+          }
+          logger("Recognizing in: " + minutes + ":" + seconds);
+        }, freq*10);
+      });
+    }
+
+    function view() {
+      document.getElementById("face-login").style.display = 'none';;
+
+      stream();
+      logger("Wait...");
+      socket.on("stream", function (video) {
+        var img = document.getElementById("img");
+        img.src = video;
+        // logger("stream play 123");
+      });
+    }
   </script>
 </body>
 </html>

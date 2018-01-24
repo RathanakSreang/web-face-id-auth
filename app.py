@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='static')
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
@@ -9,6 +9,9 @@ socketio = SocketIO(app)
 def index():
     return render_template('index.html')
 
+@app.route('/login')
+def login():
+    return render_template('index.html')
 # @socketio.on('my event')
 # def test_message(message):
 #     emit('my response', {'data': message['data']})
