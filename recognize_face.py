@@ -37,7 +37,7 @@ class RecognizeFace:
 
     def Recognize(self):
       if len(self.faces) == 0:
-        return 'Unknown'
+        return [None, 'Unknown', 1]
       result = [0, 0]
       with self.model_graph.as_default():
         for idx in np.random.randint(len(self.faces), size=5):
@@ -47,7 +47,9 @@ class RecognizeFace:
             result[index] = result[index] + value
 
       if result[0] > result[1]:
-        return [1, 'Rathanak', (result[0] / 5)]
+        return [1, 'Rathanak', str(int(result[0] *100 / 5)) + '%']
       else:
-        return [None, 'Rathanak', (result[1] / 5)]
+        return [None, 'Unknown', str(int(result[0] *100 / 5)) + '%']
 
+    def ClearFace(self):
+        self.faces = []

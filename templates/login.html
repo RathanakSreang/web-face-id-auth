@@ -6,7 +6,7 @@
 
   <script src="/js/socket.io.js"></script>
   <script src="/js/jquery-2.2.1.min.js"></script>
-  <script src="/js/jquery-3.1.1.slim.min.js"></script>
+  <script src="/js/jquery-3.1.0.min.js"></script>
   <script src="/js/tether.min.js"></script>
   <script src="/js/bootstrap.min.js"></script>
   <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
@@ -129,17 +129,24 @@
       });
 
       socket.on("stream-end", function (data) {
-        document.getElementById("face-login").style.display = 'none';
-        // document.getElementById("img").style.display = 'none';
-        document.getElementById("face-detect").style.display = 'none';
+        $("#face-login").hide();
+        $("#face-detect").hide();
         logger("Verifying user...");
         socket.emit("verify-user", '');
       });
 
       socket.on("verify-user", function (data) {
-        document.getElementById("face-detect").style.display = 'none';
-        logger("verified, " + data['name']);
+        $("#face-detect").hide();
+        logger("verified, " + data['name'] + ", accouracy: " + data['accouracy']);
         console.log(data)
+        if(data['id']) {
+          $("#face-login").hide();
+          $.post("/login", {'auth_key': data['auth_key']}, function(data) {
+            location.reload();
+          })
+        } else {
+          $("#face-login").show();
+        }
       });
     }
 

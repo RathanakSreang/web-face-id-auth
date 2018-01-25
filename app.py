@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, session
+from flask import Flask, render_template, redirect, url_for, session, request
 from flask_socketio import SocketIO, emit
 from flask_login import LoginManager, UserMixin, current_user, login_user, \
                         login_required, logout_user
@@ -44,14 +44,18 @@ def load_user(id):
 def index():
     return render_template('index.html', user_name = current_user)
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
+    if request.method == 'GET':
+      return render_template('login.html')
 
-    # login_user(User(1, 'Rathanak'))
-    # session['user_1'] = 'Rathanak'
-    return render_template('login.html')
+    print(request.form)
+    if request.form['auth_key'] == '1234567890':
+      login_user(User(1, 'Rathanak'))
+      session['user_1'] = 'Rathanak'
+    return redirect(url_for('login'))
 
 @app.route('/logout')
 @login_required
@@ -87,6 +91,7 @@ def send_image_end(img):
 @socketio.on('verify-user')
 def verifyt_user(img):
   id, name, accouracy = recognizer.Recognize()
+  recognizer.ClearFace()
   auth_key = ''
   if id is not None:
       auth_key = '1234567890'
