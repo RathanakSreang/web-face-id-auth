@@ -1,3 +1,15 @@
+# Train model
+To train model run:
+
+```
+python training_model.py
+```
+# Test model
+To test the train model on terminal run:
+```
+```
+
+# Development
 To install python the dependencies:
 
 ```

@@ -8,7 +8,7 @@ from keras.layers import Dense
 from keras.layers import Dropout
 from keras.layers import Flatten
 from keras.constraints import maxnorm
-from keras.optimizers import SGD, Adam
+from keras.optimizers import SGD
 from keras.layers.convolutional import Conv2D
 from keras.layers.convolutional import MaxPooling2D
 
@@ -84,9 +84,8 @@ model.add(Dense(num_classes, activation='softmax'))
 epochs = 25
 lrate = 0.01
 decay = lrate/epochs
-# sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
-opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
-model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
+sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
+model.compile(loss='binary_crossentropy', optimizer=sgd, metrics=['accuracy'])
 print(model.summary())
 
 # Fit the model

@@ -78,7 +78,7 @@
           navigator.getUserMedia({video: true}, loadCam, loadFail);
         }
 
-        var duration = 60 * 1;//
+        var duration = 60 * 0.2;//
         var timer = duration, minutes, seconds;
 
         var faceStream = setInterval(function() {
@@ -110,7 +110,6 @@
       logger("Wait...");
 
       socket.on("stream", function (data) {
-        console.log(data)
         var img = document.getElementById("img");
         img.style.display = 'block';
         img.src = data['img'];
@@ -130,9 +129,17 @@
       });
 
       socket.on("stream-end", function (data) {
-        document.getElementById("img").style.display = 'none';
+        document.getElementById("face-login").style.display = 'none';
+        // document.getElementById("img").style.display = 'none';
         document.getElementById("face-detect").style.display = 'none';
-        logger("");
+        logger("Verifying user...");
+        socket.emit("verify-user", '');
+      });
+
+      socket.on("verify-user", function (data) {
+        document.getElementById("face-detect").style.display = 'none';
+        logger("verified, " + data['name']);
+        console.log(data)
       });
     }
 
