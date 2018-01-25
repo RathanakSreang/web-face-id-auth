@@ -78,7 +78,7 @@
           navigator.getUserMedia({video: true}, loadCam, loadFail);
         }
 
-        var duration = 60 * 5;//
+        var duration = 60 * 1;//
         var timer = duration, minutes, seconds;
 
         var faceStream = setInterval(function() {
@@ -96,6 +96,7 @@
             video.src = "";
             localstream.getTracks()[0].stop();
             timer = duration;
+            socket.emit("stream-end", '');
           }
           logger("Recognizing in: " + minutes + ":" + seconds);
         }, freq*10);
@@ -111,6 +112,7 @@
       socket.on("stream", function (data) {
         console.log(data)
         var img = document.getElementById("img");
+        img.style.display = 'block';
         img.src = data['img'];
 
         var devRect = document.getElementById("face-detect");
@@ -125,6 +127,12 @@
         } else {
           devRect.style.display = 'none';
         }
+      });
+
+      socket.on("stream-end", function (data) {
+        document.getElementById("img").style.display = 'none';
+        document.getElementById("face-detect").style.display = 'none';
+        logger("");
       });
     }
 

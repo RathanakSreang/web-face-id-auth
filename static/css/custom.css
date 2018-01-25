@@ -20,6 +20,7 @@ body {
   height: 200px;
   position: relative;
   border: 1px solid #666;
+  overflow: hidden;
 }
 
 .prev-face {

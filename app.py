@@ -57,7 +57,7 @@ def logout():
 
 # real time streaming
 @socketio.on('stream')
-def test_send_image(img):
+def send_image(img):
     image = base64_2_image.data_uri_to_cv2_img(img)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     gray = imutils.resize(gray, width=200)
@@ -71,6 +71,11 @@ def test_send_image(img):
         rectFace['w'] = w
         rectFace['h'] = h
     emit('stream', {'img': img, 'rectFace': rectFace}, broadcast=True)
+
+# real time streaming
+@socketio.on('stream-end')
+def send_image_end(img):
+  emit('stream-end', {'ended': True}, broadcast=True)
 
 @socketio.on('connect')
 def test_connect():
