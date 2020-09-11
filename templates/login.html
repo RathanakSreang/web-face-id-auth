@@ -56,7 +56,9 @@
 
       function loadCam(stream) {
         localstream = stream;
-        video.src = window.URL.createObjectURL(stream);
+        video.srcObject=stream;
+        video.play();
+        // video.src = window.URL.createObjectURL(stream);
         logger("Camera loaded [OKAY]");
       }
 

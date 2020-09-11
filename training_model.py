@@ -2,19 +2,19 @@ import cv2
 import os
 import numpy as np
 
-from keras.utils import np_utils
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import Dropout
-from keras.layers import Flatten
-from keras.constraints import maxnorm
-from keras.optimizers import SGD
-from keras.layers.convolutional import Conv2D
-from keras.layers.convolutional import MaxPooling2D
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.constraints import MaxNorm
+from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import MaxPooling2D
 
 # Saving and loading model and weights
-from keras.models import model_from_json
-from keras.models import load_model
+from tensorflow.keras.models import model_from_json
+from tensorflow.keras.models import load_model
 
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
@@ -46,14 +46,14 @@ img_data = img_data.astype('float32')
 labels = np.array(labels ,dtype='int64')
 # scale down(so easy to work with)
 img_data /= 255.0
-img_data= np.expand_dims(img_data, axis=4)
+img_data= np.expand_dims(img_data, axis=3)
 # print (img_data.shape)
 # print (img_data.shape[0])
 # print(img_data.shape)
 # print(labels.shape)
 
 # convert class labels to on-hot encoding
-Y = np_utils.to_categorical(labels, num_classes)
+Y = to_categorical(labels, num_classes)
 # print(Y)
 
 #Shuffle the dataset
@@ -71,12 +71,12 @@ print(input_shape)
 
 model = Sequential()
 model = Sequential()
-model.add(Conv2D(32, (3, 3), input_shape=input_shape, padding='same', activation='relu', kernel_constraint=maxnorm(3)))
+model.add(Conv2D(32, (3, 3), input_shape=input_shape, padding='same', activation='relu', kernel_constraint=MaxNorm(3)))
 model.add(Dropout(0.2))
-model.add(Conv2D(32, (3, 3), activation='relu', padding='same', kernel_constraint=maxnorm(3)))
+model.add(Conv2D(32, (3, 3), activation='relu', padding='same', kernel_constraint=MaxNorm(3)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Flatten())
-model.add(Dense(512, activation='relu', kernel_constraint=maxnorm(3)))
+model.add(Dense(512, activation='relu', kernel_constraint=MaxNorm(3)))
 model.add(Dropout(0.5))
 model.add(Dense(num_classes, activation='softmax'))
 

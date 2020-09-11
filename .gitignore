@@ -1,1 +1,4 @@
 node_modules/
+__pycache__/
+flask_session/
+model.h5

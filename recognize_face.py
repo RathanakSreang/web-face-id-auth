@@ -1,6 +1,6 @@
 # Saving and loading model and weights
-from keras.models import model_from_json
-from keras.models import load_model
+from tensorflow.keras.models import model_from_json
+from tensorflow.keras.models import load_model
 import tensorflow as tf
 import numpy as np
 import dlib
@@ -16,8 +16,9 @@ class RecognizeFace:
         self.loaded_model = model_from_json(loaded_model_json)
         # load weights into new model
         self.loaded_model.load_weights("model.h5")
-        self.loaded_model._make_predict_function()
-        self.model_graph = tf.get_default_graph()
+        # self.loaded_model._make_predict_function()
+        tf.executing_eagerly()
+        self.model_graph = tf.compat.v1.get_default_graph()
         print("Loaded model from disk")
 
         predictor = dlib.shape_predictor("model/shape_predictor_68_face_landmarks.dat")
@@ -31,7 +32,7 @@ class RecognizeFace:
       faceAligned = np.array(faceAligned)
       faceAligned = faceAligned.astype('float32')
       faceAligned /= 256
-      faceAligned= np.expand_dims([faceAligned], axis=4)
+      faceAligned= np.expand_dims([faceAligned], axis=3)
 
       self.faces.append(faceAligned)
 
@@ -39,12 +40,13 @@ class RecognizeFace:
       if len(self.faces) == 0:
         return [None, 'Unknown', 1]
       result = [0, 0]
-      with self.model_graph.as_default():
-        for idx in np.random.randint(len(self.faces), size=5):
-          Y_pred = self.loaded_model.predict(self.faces[idx])
-          for index, value in enumerate(Y_pred[0]):
-            print(self.people[index] + str(int(value * 100)) + '%')
-            result[index] = result[index] + value
+      for idx in np.random.randint(len(self.faces), size=5):
+        self.loaded_model.run_eagerly = True
+        Y_pred = self.loaded_model.predict(self.faces[idx])
+        for index, value in enumerate(Y_pred[0]):
+          print(self.people[index] + str(int(value * 100)) + '%')
+          result[index] = result[index] + value
+      # with self.model_graph.as_default():
 
       if result[0] > result[1]:
         return [1, 'Rathanak', str(int(result[0] *100 / 5)) + '%']
